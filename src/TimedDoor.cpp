@@ -10,9 +10,10 @@ void Timer::sleep(int timeout) {
 
 void Timer::tregister(int timeout, TimerClient* client) {
   this->client = client;
+  
   if (client) {
-      sleep(timeout);
-      client->Timeout();
+    sleep(timeout);
+    client->Timeout();
   }
 }
 
@@ -20,12 +21,12 @@ DoorTimerAdapter::DoorTimerAdapter(TimedDoor& d) : door(d) {}
 
 void DoorTimerAdapter::Timeout() {
   if (door.isDoorOpened()) {
-      door.throwState();
+    door.throwState();
   }
 }
 
 TimedDoor::TimedDoor(int timeout) : iTimeout(timeout), isOpened(false) {
-    adapter = new DoorTimerAdapter(*this);
+  adapter = new DoorTimerAdapter(*this);
 }
 
 bool TimedDoor::isDoorOpened() {
@@ -34,7 +35,9 @@ bool TimedDoor::isDoorOpened() {
 
 void TimedDoor::unlock() {
   isOpened = true;
+
   Timer timer;
+
   timer.tregister(iTimeout, adapter);
 }
 
