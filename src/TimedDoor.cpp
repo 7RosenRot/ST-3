@@ -13,6 +13,7 @@ void Timer::tregister(int timeout, TimerClient* client) {
   
   if (client) {
     sleep(timeout);
+
     client->Timeout();
   }
 }
