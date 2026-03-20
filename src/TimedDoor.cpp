@@ -10,7 +10,7 @@ void Timer::sleep(int timeout) {
 
 void Timer::tregister(int timeout, TimerClient* client) {
   this->client = client;
-  
+
   if (client) {
     sleep(timeout);
 

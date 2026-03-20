@@ -1,25 +1,25 @@
 // Copyright 2021 GHA Test Team
 
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <cstdint>
 #include "TimedDoor.h"
+#include <cstdint>
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 class MockTimerClient : public TimerClient {
- public:
+public:
   MOCK_METHOD(void, Timeout, (), (override));
 };
 
 class MockDoor : public Door {
- public:
+public:
   MOCK_METHOD(void, lock, (), (override));
   MOCK_METHOD(void, unlock, (), (override));
   MOCK_METHOD(bool, isDoorOpened, (), (override));
 };
 
 class TimedDoorTest : public ::testing::Test {
- protected:
-  TimedDoor* door;
+protected:
+  TimedDoor *door;
 
   void SetUp() override { door = new TimedDoor(10); }
   void TearDown() override { delete door; }
@@ -36,7 +36,8 @@ TEST_F(TimedDoorTest, GetTimeoutReturnsCorrectValue) {
 TEST_F(TimedDoorTest, LockChangesStateToClosed) {
   try {
     door->unlock();
-  } catch(...) {}
+  } catch (...) {
+  }
 
   door->lock();
   EXPECT_FALSE(door->isDoorOpened());
@@ -53,10 +54,11 @@ TEST_F(TimedDoorTest, ReentryLock) {
 }
 
 TEST_F(TimedDoorTest, MultipleOpenCloseCycle) {
-  for(int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 3; ++i) {
     try {
       door->unlock();
-    } catch(...) {}
+    } catch (...) {
+    }
 
     EXPECT_TRUE(door->isDoorOpened());
 
@@ -91,7 +93,8 @@ TEST(AdapterLogic, ThrowsIfDoorOpened) {
 
   try {
     d.unlock();
-  } catch(...) {} 
+  } catch (...) {
+  }
 
   EXPECT_THROW(adapter.Timeout(), std::runtime_error);
 }
@@ -120,7 +123,7 @@ TEST(BoundaryTests, ZeroTimeoutExecution) {
 }
 
 TEST(BoundaryTests, NegativeTimeoutIsHandled) {
-  TimedDoor d(-1); 
+  TimedDoor d(-1);
 
   EXPECT_THROW(d.unlock(), std::runtime_error);
 }
@@ -154,7 +157,8 @@ TEST(Sequence, LockUnlockSequence) {
 
   try {
     d.unlock();
-  } catch(...) {}
+  } catch (...) {
+  }
 
   EXPECT_TRUE(d.isDoorOpened());
 }
@@ -173,7 +177,7 @@ TEST(ExceptionMessage, RuntimeErrorMessageIsCorrect) {
 
   try {
     d.unlock();
-  } catch (const std::runtime_error& e) {
+  } catch (const std::runtime_error &e) {
     EXPECT_STREQ(e.what(), "Timeout: Door is still open!");
   }
 }
@@ -192,7 +196,7 @@ TEST(TimerMultiple, MultipleRegisters) {
 TEST(Stress, RapidLockUnlock) {
   TimedDoor d(1);
 
-  for(int i=0; i<5; ++i) {
+  for (int i = 0; i < 5; ++i) {
     d.lock();
 
     EXPECT_FALSE(d.isDoorOpened());
@@ -217,7 +221,9 @@ TEST(TimerInteraction, TimerWaitCheck) {
   t.tregister(50, &mock);
 
   auto end = std::chrono::steady_clock::now();
-  auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+  auto elapsed =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+          .count();
 
   EXPECT_GE(elapsed, 45);
 }
@@ -225,9 +231,7 @@ TEST(TimerInteraction, TimerWaitCheck) {
 TEST(MockInteraction, TimerCallsClientTimeout) {
   Timer timer;
   MockTimerClient mockClient;
-
   EXPECT_CALL(mockClient, Timeout()).Times(1);
-
   timer.tregister(10, &mockClient);
 }
 
@@ -239,7 +243,7 @@ TEST(ExceptionType, IsCorrectType) {
 
   try {
     d.unlock();
-  } catch (const std::runtime_error&) {
+  } catch (const std::runtime_error &) {
     caught = true;
   } catch (...) {
     FAIL() << "Expected std::runtime_error";
@@ -268,7 +272,8 @@ TEST(AdapterLogic, DetectsLateOpening) {
 
   try {
     d.unlock();
-  } catch(...) {}
+  } catch (...) {
+  }
 
   EXPECT_THROW(ad.Timeout(), std::runtime_error);
 }
